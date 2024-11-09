@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "convex dev --tail-logs",
+    "dev": "convex dev --tail-logs --live-component-sources --typecheck-components",
     "setup": "convex dev --once && convex env set VALIDATE_ENV=true",
     "seed": "convex dev --once && convex run init"
   },
@@ -11,8 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@convex-dev/auth": "^0.0.74",
+    "@convex-dev/polar": "link:@convex-dev/polar",
     "convex": "^1.17.0",
-    "convex-helpers": "^0.1.63",
+    "convex-helpers": "^0.1.59",
     "openai": "^4.61.1",
     "standardwebhooks": "^1.0.0"
   }
