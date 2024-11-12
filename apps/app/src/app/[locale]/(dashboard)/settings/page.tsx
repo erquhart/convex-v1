@@ -52,7 +52,7 @@ export default function DashboardSettings() {
     }
   };
 
-  const unsubscribeHref = `https://sandbox.polar.sh/purchases/subscriptions/${user?.subscription?.polarId}`;
+  const unsubscribeHref = `https://sandbox.polar.sh/purchases/subscriptions/${user?.subscription?.id}`;
 
   const usernameForm = useForm({
     validatorAdapter: zodValidator(),

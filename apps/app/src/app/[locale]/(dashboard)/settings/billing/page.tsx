@@ -1,41 +1,26 @@
 "use client";
 
-import { getLocaleCurrency } from "@/utils/misc";
-import { Polar } from "@polar-sh/sdk";
 import { api } from "@v1/backend/convex/_generated/api";
-import { CURRENCIES, PLANS } from "@v1/backend/convex/schema";
 import { Button } from "@v1/ui/button";
 import { Switch } from "@v1/ui/switch";
-import { useAction, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { useState } from "react";
 
 export default function BillingSettings() {
   const user = useQuery(api.users.getUser);
-  const getUpgradeCheckoutUrl = useAction(
-    api.subscriptions.getProOnboardingCheckoutUrl,
-  );
   const plans = useQuery(api.subscriptions.listPlans);
 
   const [selectedPlanInterval, setSelectedPlanInterval] = useState<
     "month" | "year"
   >("month");
 
-  const currency = getLocaleCurrency();
-
-  const freePlan = plans?.find((plan) => plan.key === PLANS.FREE);
-  const proPlan = plans?.find((plan) => plan.key === PLANS.PRO);
-
-  const handleUpgradeCheckout = async () => {
-    const url = await getUpgradeCheckoutUrl({ interval: selectedPlanInterval });
-    if (!url) {
-      return;
-    }
-    window.location.href = url;
-  };
-
   if (!user || !plans) {
     return null;
   }
+
+  const freePlan = plans.find((plan) =>
+    plan.prices.some((price) => price.amountType === "free"),
+  );
 
   return (
     <div className="flex h-full w-full flex-col gap-6">
@@ -65,22 +50,23 @@ export default function BillingSettings() {
           <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
             You are currently on the{" "}
             <span className="flex h-[18px] items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
-              {user.plan?.key
-                ? user.plan?.key.charAt(0).toUpperCase() +
-                  user.plan?.key.slice(1)
+              {user.subscription?.product?.name
+                ? user.subscription?.product.name.charAt(0).toUpperCase() +
+                  user.subscription?.product.name.slice(1)
                 : "Free"}
             </span>
             plan.
           </p>
         </div>
 
-        {user.subscription?.planId === freePlan?._id && (
+        {user.subscription?.product?.id === freePlan?.id && (
           <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
             {plans.map((plan) => (
               <div
-                key={plan._id}
+                key={plan.id}
                 className={`flex w-full select-none items-center rounded-md border border-border ${
-                  user.subscription?.planId === plan._id && "border-primary/60"
+                  user.subscription?.product?.id === plan.id &&
+                  "border-primary/60"
                 }`}
               >
                 <div className="flex w-full flex-col items-start p-4">
@@ -88,17 +74,16 @@ export default function BillingSettings() {
                     <span className="text-base font-medium text-primary">
                       {plan.name}
                     </span>
-                    {plan._id !== freePlan?._id && (
+                    {/*plan.id !== freePlan?.id && (
                       <span className="flex items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
                         {currency === CURRENCIES.USD ? "$" : "€"}{" "}
-                        {/* TODO: remove assertions */}
                         {selectedPlanInterval === "month"
-                          ? (plan.prices.month?.[currency]?.amount ?? 0) / 100
-                          : (plan.prices.year?.[currency]?.amount ?? 0) /
+                          ? (plan.prices.find((price) => price.recurring_interval === INTERVALS.MONTH)?.[currency]?.amount ?? 0) / 100
+                          : (plan.prices.find((price) => price.recurring_interval === INTERVALS.YEAR)?.[currency]?.amount ?? 0) /
                             100}{" "}
                         / {selectedPlanInterval === "month" ? "month" : "year"}
                       </span>
-                    )}
+                    )*/}
                   </div>
                   <p className="text-start text-sm font-normal text-primary/60">
                     {plan.description}
@@ -106,7 +91,7 @@ export default function BillingSettings() {
                 </div>
 
                 {/* Billing Switch */}
-                {plan._id !== freePlan?._id && (
+                {plan.id !== freePlan?.id && (
                   <div className="flex items-center gap-2 px-4">
                     <label
                       htmlFor="interval-switch"
@@ -130,7 +115,7 @@ export default function BillingSettings() {
           </div>
         )}
 
-        {user.subscription && user.subscription.planId === proPlan?._id && (
+        {/*user.subscription && user.subscription.product?.id === proPlan?.id && (
           <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
             <div className="flex w-full items-center overflow-hidden rounded-md border border-primary/60">
               <div className="flex w-full flex-col items-start p-4">
@@ -139,7 +124,7 @@ export default function BillingSettings() {
                     {proPlan?.name}
                   </span>
                   <p className="flex items-start gap-1 text-sm font-normal text-primary/60">
-                    {user.subscription.cancelAtPeriodEnd === true ? (
+                    {user.subscription.cancel_at_period_end === true ? (
                       <span className="flex h-[18px] items-center text-sm font-medium text-red-500">
                         Expires
                       </span>
@@ -161,15 +146,21 @@ export default function BillingSettings() {
               </div>
             </div>
           </div>
-        )}
+        )*/}
 
         <div className="flex min-h-14 w-full items-center justify-between rounded-lg rounded-t-none border-t border-border bg-secondary px-6 py-3 dark:bg-card">
           <p className="text-sm font-normal text-primary/60">
             You will not be charged for testing the subscription upgrade.
           </p>
-          {user.subscription?.planId === freePlan?._id && (
-            <Button type="submit" size="sm" onClick={handleUpgradeCheckout}>
-              Upgrade to PRO
+          {user.subscription?.product?.id === freePlan?.id && (
+            <Button type="button" size="sm" asChild>
+              <a
+                href={`https://sandbox.polar.sh/purchases/subscriptions/${user.subscription?.id}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Upgrade to PRO
+              </a>
             </Button>
           )}
         </div>
@@ -192,7 +183,7 @@ export default function BillingSettings() {
           </p>
 
           <a
-            href={`https://sandbox.polar.sh/purchases/subscriptions/${user.subscription?.polarId}`}
+            href={`https://sandbox.polar.sh/purchases/subscriptions/${user.subscription?.id}`}
             target="_blank"
             rel="noreferrer"
           >

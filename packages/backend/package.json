@@ -13,6 +13,7 @@
   "dependencies": {
     "@convex-dev/auth": "^0.0.74",
     "@convex-dev/polar": "link:@convex-dev/polar",
+    "@polar-sh/sdk": "^0.15.1",
     "convex": "^1.17.0",
     "convex-helpers": "^0.1.59",
     "openai": "^4.61.1",

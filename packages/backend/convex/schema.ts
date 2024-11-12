@@ -55,11 +55,8 @@ export default defineSchema({
     // custom fields
     username: v.optional(v.string()),
     imageId: v.optional(v.id("_storage")),
-    polarId: v.optional(v.string()),
-    polarSubscriptionPendingId: v.optional(v.id("_scheduled_functions")),
-  })
-    .index("email", ["email"])
-    .index("polarId", ["polarId"]),
+    lastCheckoutTimestamp: v.optional(v.number()),
+  }).index("email", ["email"]),
   plans: defineTable({
     key: planKeyValidator,
     polarProductId: v.string(),

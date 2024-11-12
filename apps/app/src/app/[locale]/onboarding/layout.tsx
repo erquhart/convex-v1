@@ -21,9 +21,9 @@ export default async function Layout({
   if (!checkoutUrl) {
     return null;
   }
-  if (!user?.subscription && !user?.polarSubscriptionPendingId) {
+  if (!user?.subscription && !user?.lastCheckoutTimestamp) {
     await fetchMutation(
-      api.subscriptions.setSubscriptionPending,
+      api.subscriptions.updateCheckoutTimestamp,
       {},
       { token: convexAuthNextjsToken() },
     );
