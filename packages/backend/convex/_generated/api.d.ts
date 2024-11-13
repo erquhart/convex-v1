@@ -16,7 +16,6 @@ import type * as http from "../http.js";
 import type * as init from "../init.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
-import type * as util from "../util.js";
 import type * as utils_validators from "../utils/validators.js";
 import type * as web from "../web.js";
 
@@ -42,7 +41,6 @@ declare const fullApi: ApiFromModules<{
   init: typeof init;
   subscriptions: typeof subscriptions;
   users: typeof users;
-  util: typeof util;
   "utils/validators": typeof utils_validators;
   web: typeof web;
 }>;
@@ -185,141 +183,6 @@ export declare const components: {
           userId: string;
         } | null
       >;
-      insertBenefit: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          benefit: {
-            createdAt: string;
-            deletable: boolean;
-            description: string;
-            id: string;
-            modifiedAt: string | null;
-            organizationId: string;
-            properties: Record<string, any>;
-            selectable: boolean;
-            type?: string;
-          };
-        },
-        any
-      >;
-      insertBenefitGrant: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          benefitGrant: {
-            benefitId: string;
-            createdAt: string;
-            grantedAt: string | null;
-            id: string;
-            isGranted: boolean;
-            isRevoked: boolean;
-            modifiedAt: string | null;
-            orderId: string | null;
-            properties: Record<string, any>;
-            revokedAt: string | null;
-            subscriptionId: string | null;
-            userId: string;
-          };
-        },
-        any
-      >;
-      insertOrder: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          order: {
-            amount: number;
-            billingReason: string;
-            checkoutId: string | null;
-            createdAt: string;
-            currency: string;
-            id: string;
-            metadata: Record<string, any>;
-            modifiedAt: string | null;
-            productId: string | null;
-            productPriceId: string;
-            subscriptionId: string | null;
-            taxAmount: number;
-            userId: string | null;
-          };
-        },
-        any
-      >;
-      insertProduct: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          product: {
-            createdAt: string;
-            description: string | null;
-            id: string;
-            isArchived: boolean;
-            isRecurring: boolean;
-            medias: Array<{
-              checksumEtag: string | null;
-              checksumSha256Base64: string | null;
-              checksumSha256Hex: string | null;
-              createdAt: string;
-              id: string;
-              isUploaded: boolean;
-              lastModifiedAt: string | null;
-              mimeType: string;
-              name: string;
-              organizationId: string;
-              path: string;
-              publicUrl: string;
-              service?: string;
-              size: number;
-              sizeReadable: string;
-              storageVersion: string | null;
-              version: string | null;
-            }>;
-            modifiedAt: string | null;
-            name: string;
-            organizationId: string;
-            prices: Array<{
-              amountType?: string;
-              createdAt: string;
-              id: string;
-              isArchived: boolean;
-              modifiedAt: string | null;
-              priceAmount?: number;
-              priceCurrency?: string;
-              productId: string;
-              recurringInterval?: string;
-              type?: string;
-            }>;
-          };
-        },
-        any
-      >;
-      insertSubscription: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          subscription: {
-            amount: number | null;
-            cancelAtPeriodEnd: boolean;
-            checkoutId: string | null;
-            createdAt: string;
-            currency: string | null;
-            currentPeriodEnd: string | null;
-            currentPeriodStart: string;
-            endedAt: string | null;
-            id: string;
-            metadata: Record<string, any>;
-            modifiedAt: string | null;
-            priceId: string;
-            productId: string;
-            recurringInterval: string;
-            startedAt: string | null;
-            status: string;
-            userId: string;
-          };
-        },
-        any
-      >;
       listBenefits: FunctionReference<
         "query",
         "internal",
@@ -336,7 +199,7 @@ export declare const components: {
           type?: string;
         }>
       >;
-      listPlans: FunctionReference<
+      listProducts: FunctionReference<
         "query",
         "internal",
         { includeArchived: boolean },
@@ -472,12 +335,6 @@ export declare const components: {
           userId: string;
         }>
       >;
-      pullProducts: FunctionReference<
-        "action",
-        "internal",
-        { polarAccessToken: string; polarOrganizationId: string },
-        any
-      >;
       updateBenefit: FunctionReference<
         "mutation",
         "internal",
@@ -584,55 +441,6 @@ export declare const components: {
               type?: string;
             }>;
           };
-        },
-        any
-      >;
-      updateProducts: FunctionReference<
-        "mutation",
-        "internal",
-        {
-          polarAccessToken: string;
-          products: Array<{
-            createdAt: string;
-            description: string | null;
-            id: string;
-            isArchived: boolean;
-            isRecurring: boolean;
-            medias: Array<{
-              checksumEtag: string | null;
-              checksumSha256Base64: string | null;
-              checksumSha256Hex: string | null;
-              createdAt: string;
-              id: string;
-              isUploaded: boolean;
-              lastModifiedAt: string | null;
-              mimeType: string;
-              name: string;
-              organizationId: string;
-              path: string;
-              publicUrl: string;
-              service?: string;
-              size: number;
-              sizeReadable: string;
-              storageVersion: string | null;
-              version: string | null;
-            }>;
-            modifiedAt: string | null;
-            name: string;
-            organizationId: string;
-            prices: Array<{
-              amountType?: string;
-              createdAt: string;
-              id: string;
-              isArchived: boolean;
-              modifiedAt: string | null;
-              priceAmount?: number;
-              priceCurrency?: string;
-              productId: string;
-              recurringInterval?: string;
-              type?: string;
-            }>;
-          }>;
         },
         any
       >;

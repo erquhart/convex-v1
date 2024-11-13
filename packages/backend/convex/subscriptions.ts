@@ -1,32 +1,14 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { Polar as PolarComponent } from "@convex-dev/polar";
 import { Polar } from "@polar-sh/sdk";
-import { api } from "./_generated/api";
-import { action, internalAction, mutation, query } from "./_generated/server";
+import { WebhookSubscriptionCreatedPayload$inboundSchema } from "@polar-sh/sdk/models/components";
+import { v } from "convex/values";
+import { api, components } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
+import { action, internalMutation, mutation, query } from "./_generated/server";
 import { env } from "./env";
-import { polarComponent } from "./util";
-const createCheckout = async ({
-  customerEmail,
-  productPriceId,
-  successUrl,
-  subscriptionId,
-}: {
-  customerEmail: string;
-  productPriceId: string;
-  successUrl: string;
-  subscriptionId?: string;
-}) => {
-  const polar = new Polar({
-    server: "sandbox",
-    accessToken: env.POLAR_ACCESS_TOKEN,
-  });
-  const result = await polar.checkouts.create({
-    productPriceId,
-    successUrl,
-    customerEmail,
-    subscriptionId,
-  });
-  return result;
-};
+
+const polarComponent = new PolarComponent(components.polar);
 
 export const getOnboardingCheckoutUrl = action({
   args: {},
@@ -55,12 +37,19 @@ export const getOnboardingCheckoutUrl = action({
     if (!user.email) {
       throw new Error("User email not found");
     }
-    const checkout = await createCheckout({
-      customerEmail: user.email,
+    const polar = new Polar({
+      server: "sandbox",
+      accessToken: env.POLAR_ACCESS_TOKEN,
+    });
+    const result = await polar.checkouts.custom.create({
       productPriceId: price.id,
       successUrl: `${env.SITE_URL}/settings/billing`,
+      customerEmail: user.email,
+      metadata: {
+        userId: user._id,
+      },
     });
-    return checkout.url;
+    return result.url;
   },
 });
 
@@ -77,13 +66,6 @@ export const listPlans = query({
   },
 });
 
-export const pullProducts = internalAction({
-  args: {},
-  handler: async (ctx) => {
-    await polarComponent.pullProducts(ctx);
-  },
-});
-
 export const updateCheckoutTimestamp = mutation({
   args: {},
   handler: async (ctx) => {
@@ -94,5 +76,25 @@ export const updateCheckoutTimestamp = mutation({
     await ctx.db.patch(userId, {
       lastCheckoutTimestamp: Date.now(),
     });
+  },
+});
+
+export const polarEventCallback = internalMutation({
+  args: {
+    payload: v.any(),
+  },
+  handler: async (ctx, args) => {
+    switch (args.payload.type) {
+      case "subscription.created": {
+        const payload = WebhookSubscriptionCreatedPayload$inboundSchema.parse(
+          args.payload,
+        );
+        const userId = payload.data.metadata.userId;
+        await ctx.db.patch(userId as Id<"users">, {
+          polarId: payload.data.userId,
+        });
+        break;
+      }
+    }
   },
 });

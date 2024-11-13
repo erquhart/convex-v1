@@ -7,9 +7,7 @@ import { components } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
 import { username } from "./utils/validators";
 
-const polarComponent = new PolarComponent(components.polar, {
-  httpPath: "/events/polar",
-});
+const polarComponent = new PolarComponent(components.polar);
 
 export const getUser = query({
   handler: async (ctx) => {
@@ -21,11 +19,12 @@ export const getUser = query({
     if (!user) {
       return;
     }
-    const subscription = (
-      await polarComponent.listUserSubscriptions(ctx, userId)
-    ).filter((subscription) =>
-      ["past_due", "active"].includes(subscription.status),
-    )[0];
+    const subscription = user.polarId
+      ? (await polarComponent.listUserSubscriptions(ctx, user.polarId)).filter(
+          (subscription) =>
+            ["past_due", "active"].includes(subscription.status),
+        )[0]
+      : undefined;
     return {
       ...user,
       name: user.username || user.name,
@@ -101,14 +100,14 @@ export const deleteCurrentUserAccount = mutation({
     if (!user) {
       throw new Error("User not found");
     }
-    const subscription = await ctx.db
-      .query("subscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .unique();
-    if (!subscription) {
-      console.error("No subscription found");
-    } else {
-      await ctx.db.delete(subscription._id);
+    const subscription = user.polarId
+      ? (await polarComponent.listUserSubscriptions(ctx, user.polarId)).filter(
+          (subscription) =>
+            ["past_due", "active"].includes(subscription.status),
+        )[0]
+      : undefined;
+    if (subscription?.status === "active") {
+      throw new Error("User has an active subscription");
     }
     await asyncMap(
       ["google" /* add other providers as needed */],

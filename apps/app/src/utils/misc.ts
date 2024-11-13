@@ -1,11 +1,11 @@
-import { CURRENCIES } from "@v1/backend/convex/schema";
-
 /**
  * Locales.
+ *
+ * Update this logic to reflect supported currencies in your app.
  */
 export function getLocaleCurrency() {
   return navigator.languages.includes("en-US")
-    ? CURRENCIES.USD
-    : // Only support USD for now due to Polar limitations.
-      CURRENCIES.USD;
+    ? "usd"
+    : // This can be replaced with "eur" for apps that support only USD and EUR.
+      "usd";
 }
