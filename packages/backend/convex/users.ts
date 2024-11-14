@@ -2,6 +2,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { asyncMap } from "convex-helpers";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { env } from "./env";
 import { polar as polarComponent } from "./subscriptions";
 import { username } from "./utils/validators";
 
@@ -15,7 +16,6 @@ export const getUser = query({
     if (!user) {
       return;
     }
-    console.log("user", user);
     const subscription = user.polarId
       ? (
           await polarComponent.listUserSubscriptions(ctx, {
@@ -25,11 +25,15 @@ export const getUser = query({
           ["past_due", "active"].includes(subscription.status),
         )[0]
       : undefined;
-    console.log("subscription", subscription);
     return {
       ...user,
       name: user.username || user.name,
       subscription,
+      manageSubscriptionUrl: subscription
+        ? `https://${
+            env.POLAR_SERVER === "sandbox" ? "sandbox." : ""
+          }polar.sh/purchases/subscriptions/${subscription.id}`
+        : undefined,
       avatarUrl: user.imageId
         ? await ctx.storage.getUrl(user.imageId)
         : undefined,

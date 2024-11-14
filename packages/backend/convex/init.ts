@@ -37,9 +37,10 @@ export default internalAction(async (ctx) => {
   const products = await polar.products.list({
     organizationId: env.POLAR_ORGANIZATION_ID,
   });
+  // If Polar products already exist, skip creation and seeding.
   if (products?.result?.items?.length) {
     console.info("🏃‍♂️ Skipping Polar products creation and seeding.");
-    //return;
+    return;
   }
   await asyncMap(seedProducts, async (product) => {
     // Create Polar product.

@@ -3,6 +3,7 @@ import { Polar as PolarComponent } from "@convex-dev/polar";
 import { Polar } from "@polar-sh/sdk";
 import { WebhookSubscriptionCreatedPayload$inboundSchema } from "@polar-sh/sdk/models/components";
 import { v } from "convex/values";
+import { sortBy } from "remeda";
 import { api, components } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { action, internalMutation, mutation, query } from "./_generated/server";
@@ -59,9 +60,13 @@ export const listPlans = query({
     if (!userId) {
       throw new Error("User not found");
     }
-    return polarComponent.listProducts(ctx, {
+    const plans = await polarComponent.listProducts(ctx, {
       includeArchived: false,
     });
+    return sortBy(
+      plans,
+      (plan) => !plan.prices.some((price) => price.amountType === "free"),
+    );
   },
 });
 
