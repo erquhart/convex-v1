@@ -63,6 +63,8 @@ export declare const components: {
         "internal",
         { id: string },
         {
+          _creationTime: number;
+          _id: string;
           createdAt: string;
           deletable: boolean;
           description: string;
@@ -79,6 +81,8 @@ export declare const components: {
         "internal",
         { id: string },
         {
+          _creationTime: number;
+          _id: string;
           benefitId: string;
           createdAt: string;
           grantedAt: string | null;
@@ -98,6 +102,8 @@ export declare const components: {
         "internal",
         { id: string },
         {
+          _creationTime: number;
+          _id: string;
           amount: number;
           billingReason: string;
           checkoutId: string | null;
@@ -118,6 +124,8 @@ export declare const components: {
         "internal",
         { id: string },
         {
+          _creationTime: number;
+          _id: string;
           createdAt: string;
           description: string | null;
           id: string;
@@ -164,6 +172,8 @@ export declare const components: {
         "internal",
         { id: string },
         {
+          _creationTime: number;
+          _id: string;
           amount: number | null;
           cancelAtPeriodEnd: boolean;
           checkoutId: string | null;
@@ -188,6 +198,8 @@ export declare const components: {
         "internal",
         any,
         Array<{
+          _creationTime: number;
+          _id: string;
           createdAt: string;
           deletable: boolean;
           description: string;
@@ -252,6 +264,8 @@ export declare const components: {
         "internal",
         { userId: string },
         Array<{
+          _creationTime: number;
+          _id: string;
           benefitId: string;
           createdAt: string;
           grantedAt: string | null;

@@ -22,6 +22,9 @@ export default function BillingSettings() {
     plan.prices.some((price) => price.amountType === "free"),
   );
 
+  console.log("user.subscription?.product?.id", user.subscription?.product?.id);
+  console.log("freePlan?.id", freePlan?.id);
+
   return (
     <div className="flex h-full w-full flex-col gap-6">
       <div className="flex w-full flex-col gap-2 p-6 py-2">
@@ -59,61 +62,62 @@ export default function BillingSettings() {
           </p>
         </div>
 
-        {user.subscription?.product?.id === freePlan?.id && (
-          <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className={`flex w-full select-none items-center rounded-md border border-border ${
-                  user.subscription?.product?.id === plan.id &&
-                  "border-primary/60"
-                }`}
-              >
-                <div className="flex w-full flex-col items-start p-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-medium text-primary">
-                      {plan.name}
+        <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">
+          {plans.map((plan) => (
+            <div
+              key={plan.id}
+              className={`flex w-full select-none items-center rounded-md border border-border ${
+                user.subscription?.product?.id === plan.id &&
+                "border-primary/60"
+              }`}
+            >
+              <div className="flex w-full flex-col items-start p-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-medium text-primary">
+                    {plan.name}
+                  </span>
+                  {plan.name !== "Free" && (
+                    <span className="flex items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
+                      {"$ "}
+                      {selectedPlanInterval === "month"
+                        ? (plan.prices.find(
+                            (price) => price.recurringInterval === "month",
+                          )?.priceAmount ?? 0) / 100
+                        : (plan.prices.find(
+                            (price) => price.recurringInterval === "year",
+                          )?.priceAmount ?? 0) / 100}{" "}
+                      / {selectedPlanInterval === "month" ? "month" : "year"}
                     </span>
-                    {/*plan.id !== freePlan?.id && (
-                      <span className="flex items-center rounded-md bg-primary/10 px-1.5 text-sm font-medium text-primary/80">
-                        {currency === CURRENCIES.USD ? "$" : "€"}{" "}
-                        {selectedPlanInterval === "month"
-                          ? (plan.prices.find((price) => price.recurring_interval === INTERVALS.MONTH)?.[currency]?.amount ?? 0) / 100
-                          : (plan.prices.find((price) => price.recurring_interval === INTERVALS.YEAR)?.[currency]?.amount ?? 0) /
-                            100}{" "}
-                        / {selectedPlanInterval === "month" ? "month" : "year"}
-                      </span>
-                    )*/}
-                  </div>
-                  <p className="text-start text-sm font-normal text-primary/60">
-                    {plan.description}
-                  </p>
+                  )}
                 </div>
-
-                {/* Billing Switch */}
-                {plan.id !== freePlan?.id && (
-                  <div className="flex items-center gap-2 px-4">
-                    <label
-                      htmlFor="interval-switch"
-                      className="text-start text-sm text-primary/60"
-                    >
-                      {selectedPlanInterval === "month" ? "Monthly" : "Yearly"}
-                    </label>
-                    <Switch
-                      id="interval-switch"
-                      checked={selectedPlanInterval === "year"}
-                      onCheckedChange={() =>
-                        setSelectedPlanInterval((prev) =>
-                          prev === "month" ? "year" : "month",
-                        )
-                      }
-                    />
-                  </div>
-                )}
+                <p className="text-start text-sm font-normal text-primary/60">
+                  {plan.description}
+                </p>
               </div>
-            ))}
-          </div>
-        )}
+
+              {/* Billing Switch */}
+              {plan.id !== freePlan?.id && (
+                <div className="flex items-center gap-2 px-4">
+                  <label
+                    htmlFor="interval-switch"
+                    className="text-start text-sm text-primary/60"
+                  >
+                    {selectedPlanInterval === "month" ? "Monthly" : "Yearly"}
+                  </label>
+                  <Switch
+                    id="interval-switch"
+                    checked={selectedPlanInterval === "year"}
+                    onCheckedChange={() =>
+                      setSelectedPlanInterval((prev) =>
+                        prev === "month" ? "year" : "month",
+                      )
+                    }
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
 
         {/*user.subscription && user.subscription.product?.id === proPlan?.id && (
           <div className="flex w-full flex-col items-center justify-evenly gap-2 border-border p-6 pt-0">

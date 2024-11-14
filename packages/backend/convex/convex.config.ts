@@ -1,4 +1,4 @@
-import polar from "@convex-dev/polar/convex.config";
+import polar from "@erquhart/convex-polar/convex.config";
 import { defineApp } from "convex/server";
 
 const app = defineApp();

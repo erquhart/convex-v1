@@ -9,6 +9,7 @@ import { action, internalMutation, mutation, query } from "./_generated/server";
 import { env } from "./env";
 
 const polarComponent = new PolarComponent(components.polar);
+export { polarComponent as polar };
 
 export const getOnboardingCheckoutUrl = action({
   args: {},
@@ -29,8 +30,6 @@ export const getOnboardingCheckoutUrl = action({
       (price) =>
         price.recurringInterval === "month" && price.amountType === "free",
     );
-    console.log("freePlan", freePlan);
-    console.log("price", price);
     if (!price) {
       throw new Error("Price not found");
     }

@@ -1,16 +1,15 @@
-import { Polar as PolarComponent } from "@convex-dev/polar";
+import { Polar as PolarComponent } from "@erquhart/convex-polar";
 import { httpRouter } from "convex/server";
 import { api, components, internal } from "./_generated/api";
 import { auth } from "./auth";
+import { polar } from "./subscriptions";
 
 const http = httpRouter();
 
 auth.addHttpRoutes(http);
 
-const polarComponent = new PolarComponent(components.polar);
-
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-polarComponent.registerRoutes(http as any, {
+polar.registerRoutes(http as any, {
   path: "/events/polar",
   eventCallback: internal.subscriptions.polarEventCallback,
 });

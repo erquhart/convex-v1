@@ -1,13 +1,9 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { Polar as PolarComponent } from "@convex-dev/polar";
 import { asyncMap } from "convex-helpers";
 import { v } from "convex/values";
-import { z } from "zod";
-import { components } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
+import { polar as polarComponent } from "./subscriptions";
 import { username } from "./utils/validators";
-
-const polarComponent = new PolarComponent(components.polar);
 
 export const getUser = query({
   handler: async (ctx) => {
@@ -19,12 +15,17 @@ export const getUser = query({
     if (!user) {
       return;
     }
+    console.log("user", user);
     const subscription = user.polarId
-      ? (await polarComponent.listUserSubscriptions(ctx, user.polarId)).filter(
-          (subscription) =>
-            ["past_due", "active"].includes(subscription.status),
+      ? (
+          await polarComponent.listUserSubscriptions(ctx, {
+            userId: user.polarId,
+          })
+        ).filter((subscription) =>
+          ["past_due", "active"].includes(subscription.status),
         )[0]
       : undefined;
+    console.log("subscription", subscription);
     return {
       ...user,
       name: user.username || user.name,
@@ -101,9 +102,12 @@ export const deleteCurrentUserAccount = mutation({
       throw new Error("User not found");
     }
     const subscription = user.polarId
-      ? (await polarComponent.listUserSubscriptions(ctx, user.polarId)).filter(
-          (subscription) =>
-            ["past_due", "active"].includes(subscription.status),
+      ? (
+          await polarComponent.listUserSubscriptions(ctx, {
+            userId: user.polarId,
+          })
+        ).filter((subscription) =>
+          ["past_due", "active"].includes(subscription.status),
         )[0]
       : undefined;
     if (subscription?.status === "active") {
