@@ -13,7 +13,6 @@ const polarComponent = new PolarComponent(components.polar);
 export { polarComponent as polar };
 
 export const getOnboardingCheckoutUrl = action({
-  args: {},
   handler: async (ctx) => {
     const user = await ctx.runQuery(api.users.getUser);
     if (!user) {
