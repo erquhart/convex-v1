@@ -39,7 +39,6 @@ export default function DashboardSettings() {
   };
 
   const handleDeleteAccount = async () => {
-    console.log(user?.subscription);
     if (
       user?.subscription?.status &&
       ["active", "incomplete"].includes(user.subscription.status) &&
@@ -51,8 +50,6 @@ export default function DashboardSettings() {
       signOut();
     }
   };
-
-  const unsubscribeHref = `https://sandbox.polar.sh/purchases/subscriptions/${user?.subscription?.polarId}`;
 
   const usernameForm = useForm({
     validatorAdapter: zodValidator(),
@@ -212,7 +209,7 @@ export default function DashboardSettings() {
       <UnsubscribeWarningModal
         isOpen={isUnsubscribeModalOpen}
         onClose={() => setIsUnsubscribeModalOpen(false)}
-        unsubscribeHref={unsubscribeHref}
+        unsubscribeHref={user.manageSubscriptionUrl ?? ""}
       />
     </div>
   );

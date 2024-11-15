@@ -1,8 +1,9 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { asyncMap } from "convex-helpers";
 import { v } from "convex/values";
-import { z } from "zod";
 import { mutation, query } from "./_generated/server";
+import { env } from "./env";
+import { polar as polarComponent } from "./subscriptions";
 import { username } from "./utils/validators";
 
 export const getUser = query({
@@ -15,18 +16,24 @@ export const getUser = query({
     if (!user) {
       return;
     }
-    const subscription = await ctx.db
-      .query("subscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .unique();
-    const plan = subscription?.planId
-      ? await ctx.db.get(subscription.planId)
+    const subscription = user.polarId
+      ? (
+          await polarComponent.listUserSubscriptions(ctx, {
+            userId: user.polarId,
+          })
+        ).filter((subscription) =>
+          ["past_due", "active"].includes(subscription.status),
+        )[0]
       : undefined;
     return {
       ...user,
       name: user.username || user.name,
       subscription,
-      plan,
+      manageSubscriptionUrl: subscription
+        ? `https://${
+            env.POLAR_SERVER === "sandbox" ? "sandbox." : ""
+          }polar.sh/purchases/subscriptions/${subscription.id}`
+        : undefined,
       avatarUrl: user.imageId
         ? await ctx.storage.getUrl(user.imageId)
         : undefined,
@@ -98,14 +105,17 @@ export const deleteCurrentUserAccount = mutation({
     if (!user) {
       throw new Error("User not found");
     }
-    const subscription = await ctx.db
-      .query("subscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .unique();
-    if (!subscription) {
-      console.error("No subscription found");
-    } else {
-      await ctx.db.delete(subscription._id);
+    const subscription = user.polarId
+      ? (
+          await polarComponent.listUserSubscriptions(ctx, {
+            userId: user.polarId,
+          })
+        ).filter((subscription) =>
+          ["past_due", "active"].includes(subscription.status),
+        )[0]
+      : undefined;
+    if (subscription?.status === "active") {
+      throw new Error("User has an active subscription");
     }
     await asyncMap(
       ["google" /* add other providers as needed */],
